@@ -5,7 +5,7 @@ import { db } from "@/lib/firebase/client";
 import { doc, onSnapshot, updateDoc, serverTimestamp } from "firebase/firestore";
 import { formatCurrency } from "@/lib/pricing";
 import { format } from "date-fns";
-import { Loader2, Send, FileText, CheckCircle, Copy, ExternalLink, Trash2 } from "lucide-react";
+import { Loader2, Send, FileText, CheckCircle, Copy, ExternalLink, Trash2, Users, Receipt } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ReservationStatus } from "@/types";
 import { use } from "react";
@@ -321,6 +321,90 @@ export default function ReservationDetailPage({
                 Create &amp; Email Invoice
               </button>
             </div>
+          )}
+        </div>
+      </div>
+
+      {/* Connecteam + Invoice info */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Connecteam */}
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <Users size={18} className="text-green-600" /> Connecteam Shift
+          </h2>
+          {reservation.connecteamShiftIds && Object.keys(reservation.connecteamShiftIds).length > 0 ? (
+            <div className="space-y-2 text-sm">
+              {Object.entries(reservation.connecteamShiftIds).map(([key, shiftId]: [string, any]) => (
+                <div key={key} className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
+                  <div>
+                    <div className="text-xs text-gray-500 mb-0.5">Shift ID</div>
+                    <div className="font-mono text-gray-900">{shiftId}</div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {reservation.contractSignedAt ? (
+                      <span className="flex items-center gap-1 text-xs text-green-700 font-medium">
+                        <CheckCircle size={12} /> Published
+                      </span>
+                    ) : (
+                      <span className="text-xs text-orange-600 font-medium">Draft</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {reservation.connecteamAssignedUsers && reservation.connecteamAssignedUsers.length > 0 && (
+                <div className="pt-2 border-t">
+                  <div className="text-xs text-gray-500 mb-1">Assigned</div>
+                  <div className="text-gray-900">{reservation.connecteamAssignedUsers.join(", ")}</div>
+                </div>
+              )}
+              <a
+                href={`https://app.connecteam.com/index.html#/index/shift-scheduler/shiftscheduler/${process.env.NEXT_PUBLIC_CONNECTEAM_SCHEDULER_ID || ""}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-green-700 hover:underline text-xs"
+              >
+                Open in Connecteam <ExternalLink size={11} />
+              </a>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">No shift yet — will be created when contract is sent.</p>
+          )}
+        </div>
+
+        {/* Invoice summary */}
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <Receipt size={18} className="text-green-600" /> Invoice Summary
+          </h2>
+          {reservation.qboInvoiceId ? (
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Invoice #</span>
+                <span className="font-semibold">{reservation.qboDocNumber || "—"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Amount</span>
+                <span className="font-semibold text-green-700">{formatCurrency(reservation.grandTotal || 0)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Status</span>
+                <span className={`font-medium ${reservation.status === "paid" ? "text-green-700" : "text-orange-600"}`}>
+                  {reservation.status === "paid" ? "Paid" : "Awaiting Payment"}
+                </span>
+              </div>
+              {reservation.qboInvoiceUrl && (
+                <a
+                  href={reservation.qboInvoiceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-green-700 hover:underline text-xs pt-1"
+                >
+                  View in QuickBooks <ExternalLink size={11} />
+                </a>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">No invoice yet — auto-created when contract is signed.</p>
           )}
         </div>
       </div>

@@ -21,7 +21,8 @@
         "QBO_CLIENT_SECRET": "M6YnjrjT2GBj8dB4kFwj74R9ZlVvF01Cy8AHddFI",
         "QBO_SANDBOX": "false",
         "CONNECTEAM_API_KEY": "abbd17f9-ed28-4c95-93d3-bb9f4a3e080f",
-        "CONNECTEAM_SCHEDULER_ID": "4385224"
+        "CONNECTEAM_SCHEDULER_ID": "4385224",
+        "NEXT_PUBLIC_CONNECTEAM_SCHEDULER_ID": "4385224"
       }
     }
   },
