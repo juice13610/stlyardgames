@@ -56,25 +56,53 @@ export function calculatePricing(
   rentalHours: number,
   pricing: PricingSettings = DEFAULT_PRICING
 ): PricingBreakdown {
-  const itemCount = selectedItems.reduce((sum, i) => sum + i.quantity, 0);
-  const discountPct = itemCount >= 2 ? getDiscountPct(itemCount, pricing) : 0;
+  // Expand quantities into individual units and sort most expensive first
+  // so discounts always apply to cheaper games
+  const units: { inventoryId: string; displayName: string; price: number }[] = [];
+  for (const item of selectedItems) {
+    for (let q = 0; q < item.quantity; q++) {
+      units.push({ inventoryId: item.inventoryId, displayName: item.displayName, price: item.price });
+    }
+  }
+  units.sort((a, b) => b.price - a.price);
 
+  // Assign discount per unit: rank 0 = full price, rank 1 = 10% off, rank 2+ = 20% off
+  const unitDiscounts = units.map((_, rank) => {
+    if (rank === 0) return 0;
+    if (rank === 1) return 10;
+    return 20;
+  });
+
+  // Re-aggregate back into items with weighted average discount per line
   const items: ReservationItem[] = selectedItems.map((item) => {
     const unitPrice = item.price;
+    // Find all units belonging to this item and their assigned discounts
+    let remaining = item.quantity;
+    let totalDiscount = 0;
+    for (let u = 0; u < units.length && remaining > 0; u++) {
+      if (units[u].inventoryId === item.inventoryId) {
+        totalDiscount += unitDiscounts[u];
+        remaining--;
+      }
+    }
+    const avgDiscountPct = item.quantity > 0 ? totalDiscount / item.quantity : 0;
     const lineSubtotal = unitPrice * item.quantity;
-    const lineDiscount = Math.round(lineSubtotal * (discountPct / 100) * 100) / 100;
+    const lineDiscount = Math.round(lineSubtotal * (avgDiscountPct / 100) * 100) / 100;
     return {
       inventoryId: item.inventoryId,
       displayName: item.displayName,
       quantity: item.quantity,
       unitPrice,
-      discountPct,
+      discountPct: avgDiscountPct,
       lineTotal: Math.round((lineSubtotal - lineDiscount) * 100) / 100,
     };
   });
 
   const subtotal = items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
-  const discountTotal = Math.round(subtotal * (discountPct / 100) * 100) / 100;
+  const discountTotal = Math.round(
+    units.reduce((sum, unit, rank) => sum + unit.price * (unitDiscounts[rank] / 100), 0) * 100
+  ) / 100;
+  const discountPct = subtotal > 0 ? Math.round((discountTotal / subtotal) * 100 * 10) / 10 : 0;
 
   // Extra hours charge (beyond base rental period)
   const additionalHours = Math.max(0, rentalHours - pricing.baseRentalHours);

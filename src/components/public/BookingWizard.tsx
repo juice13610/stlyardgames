@@ -372,7 +372,7 @@ export default function BookingWizard() {
               <h2 className="text-xl font-bold text-gray-900">Pick Your Games</h2>
               {selectedItems.length >= 2 && (
                 <span className="text-sm bg-green-100 text-green-800 rounded-full px-3 py-1 font-medium">
-                  {pricing.discountPct}% multi-game discount!
+                  Multi-game discount applied!
                 </span>
               )}
             </div>
