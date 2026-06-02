@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { User, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut } from "firebase/auth";
+import { User, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase/client";
 
 // Only these email addresses can access the admin portal
@@ -28,8 +28,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Handle redirect result on page load
-    getRedirectResult(auth).catch(() => {});
     return onAuthStateChanged(auth, (u) => {
       setUser(u);
       setLoading(false);
@@ -40,16 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function signIn() {
     const provider = new GoogleAuthProvider();
-    try {
-      // Try popup first; fall back to redirect if blocked
-      await signInWithPopup(auth, provider);
-    } catch (e: any) {
-      if (e.code === "auth/popup-blocked" || e.code === "auth/popup-closed-by-user") {
-        await signInWithRedirect(auth, provider);
-      } else {
-        throw e;
-      }
-    }
+    await signInWithPopup(auth, provider);
   }
 
   async function signOutUser() {
