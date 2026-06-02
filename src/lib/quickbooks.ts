@@ -108,7 +108,8 @@ async function qbo<T>(method: string, path: string, body?: unknown): Promise<T> 
   const { token, realmId } = await getAccessToken();
   const base = getBase(realmId);
 
-  const res = await fetch(`${base}${path}?minorversion=65`, {
+  const separator = path.includes("?") ? "&" : "?";
+  const res = await fetch(`${base}${path}${separator}minorversion=65`, {
     method,
     headers: {
       Authorization: `Bearer ${token}`,

@@ -64,14 +64,14 @@ export async function POST(req: NextRequest) {
       await adminDb.collection("reservations").doc(reservationId).update({
         connecteamShiftIds: shiftIds.reduce((acc, id, i) => ({ ...acc, [`shift_${i}`]: id }), {}),
       });
-    } catch (shiftErr) {
-      console.error("Connecteam shift creation failed (non-fatal):", shiftErr);
+    } catch (shiftErr: any) {
+      console.error("Connecteam shift creation failed:", shiftErr?.message || shiftErr);
     }
 
     // Send contract email
     await sendContractEmail(reservation, contract as any);
 
-    return Response.json({ contractId: contractRef.id }, { status: 201 });
+    return Response.json({ contractId: contractRef.id, connecteamError: null }, { status: 201 });
   } catch (e: any) {
     console.error("Contract creation error:", e);
     return Response.json({ error: "Failed to create contract" }, { status: 500 });

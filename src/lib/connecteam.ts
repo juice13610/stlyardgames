@@ -71,10 +71,17 @@ export async function createShifts(
     `/scheduler/v1/schedulers/${schedulerId}/shifts?notifyUsers=${notifyUsers}`,
     shifts
   );
+  // Log full response for debugging
+  console.log("Connecteam createShifts response:", JSON.stringify(data).slice(0, 500));
   // Response can be single or array
   if (data.data?.shift?.id) return [data.data.shift.id];
+  if (data.data?.shift?.shiftId) return [data.data.shift.shiftId];
   if (data.data?.shifts) return data.data.shifts.map((s: any) => s.id || s.shiftId);
-  throw new Error("Unexpected Connecteam create response shape");
+  if (Array.isArray(data.data)) return data.data.map((s: any) => s.id || s.shiftId);
+  // If we got here but no error, try to extract any ID-like field
+  const raw = JSON.stringify(data);
+  console.error("Unexpected Connecteam create response:", raw);
+  throw new Error(`Unexpected Connecteam response: ${raw.slice(0, 200)}`);
 }
 
 // Publish shift(s) and notify users
