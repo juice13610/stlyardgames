@@ -82,7 +82,7 @@ export async function POST(
           memo: `STL Yard Games rental — pickup ${format(pickupDate, "MMM d")}`,
         });
 
-        await sendInvoice(invoice.Id, reservation.email || resData?.email);
+        await sendInvoice(invoice.Id, resData?.email);
 
         await adminDb.collection("reservations").doc(contract.reservationId).update({
           qboInvoiceId: invoice.Id,
