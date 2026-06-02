@@ -141,12 +141,12 @@ export default function ReservationDetailPage({
     : null;
 
   return (
-    <div className="p-8 max-w-5xl">
+    <div className="p-4 md:p-8 max-w-5xl">
       {/* Header */}
-      <div className="flex items-start justify-between mb-8">
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{reservation.customerName}</h1>
-          <p className="text-gray-500">{reservation.email} · {reservation.phone}</p>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">{reservation.customerName}</h1>
+          <p className="text-gray-500 text-sm">{reservation.email} · {reservation.phone}</p>
         </div>
         <div className="flex items-center gap-3">
           <span

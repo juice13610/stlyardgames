@@ -20,7 +20,7 @@ export default function InventoryPage() {
   const now = new Date();
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Inventory</h1>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {GAMES.filter((g) => g.active).map((game) => {
