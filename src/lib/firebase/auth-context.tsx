@@ -5,7 +5,7 @@ import { User, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut 
 import { auth } from "@/lib/firebase/client";
 
 // Only these email addresses can access the admin portal
-const ALLOWED_EMAILS = ["joeytomsfbr@gmail.com"];
+const ALLOWED_EMAILS = ["joeytomsfbr@gmail.com", "joey.toms@gmail.com", "rcfacedesigns@gmail.com"];
 
 interface AuthContext {
   user: User | null;
