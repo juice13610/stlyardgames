@@ -9,7 +9,7 @@ const QBO_PROD_BASE = "https://quickbooks.api.intuit.com/v3/company";
 const QBO_AUTH_BASE = "https://appcenter.intuit.com/connect/oauth2";
 const QBO_TOKEN_URL = "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer";
 const QBO_REVOKE_URL = "https://developer.api.intuit.com/v2/oauth2/tokens/revoke";
-const REDIRECT_URI = `${process.env.QBO_REDIRECT_BASE || process.env.NEXT_PUBLIC_APP_URL}/api/qbo/callback`;
+const REDIRECT_URI = "https://stlyardgames.com/api/qbo/callback";
 
 function getClientId() {
   return process.env.QBO_CLIENT_ID || "";
