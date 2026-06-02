@@ -142,8 +142,11 @@ export async function createInvoice(params: {
   dueDate?: string;
   memo?: string;
 }) {
-  // Find or create customer
-  const customer = await findOrCreateCustomer(params.customerName, params.email);
+  // Find or create customer and service item
+  const [customer, serviceItemId] = await Promise.all([
+    findOrCreateCustomer(params.customerName, params.email),
+    findOrCreateServiceItem(),
+  ]);
 
   // Spread discount proportionally across line items rather than using QBO's
   // DiscountAmt field (requires Discounts feature enabled in QBO settings)
@@ -170,7 +173,7 @@ export async function createInvoice(params: {
       SalesItemLineDetail: {
         Qty: l.quantity,
         UnitPrice: effectiveUnitPrice,
-        ItemRef: { value: "1", name: "Services" },
+        ItemRef: { value: serviceItemId },
       },
     };
   });
@@ -184,7 +187,7 @@ export async function createInvoice(params: {
       SalesItemLineDetail: {
         Qty: 1,
         UnitPrice: params.deliveryTotal,
-        ItemRef: { value: "1", name: "Services" },
+        ItemRef: { value: serviceItemId },
       },
     });
   }
@@ -202,6 +205,24 @@ export async function createInvoice(params: {
   // QBO POST /invoice expects the object directly (not wrapped)
   const result = await qbo<any>("POST", "/invoice", invoice);
   return result.Invoice;
+}
+
+async function findOrCreateServiceItem(): Promise<string> {
+  // Look for an existing service/non-inventory item to use as line item ref
+  const result = await qbo<any>(
+    "GET",
+    `/query?query=${encodeURIComponent("SELECT * FROM Item WHERE Type IN ('Service', 'NonInventory') MAXRESULTS 1")}`
+  );
+  const item = result?.QueryResponse?.Item?.[0];
+  if (item) return item.Id;
+
+  // Create a "Rental Services" item if none exist
+  const created = await qbo<any>("POST", "/item", {
+    Name: "Rental Services",
+    Type: "Service",
+    IncomeAccountRef: { name: "Services", value: "1" },
+  });
+  return created.Item.Id;
 }
 
 async function findOrCreateCustomer(name: string, email: string) {
