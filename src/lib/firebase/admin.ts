@@ -17,18 +17,21 @@ function getAdminApp(): App {
 
   const projectId = process.env.FB_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FB_CLIENT_EMAIL || process.env.FIREBASE_CLIENT_EMAIL;
-  const privateKey = (process.env.FB_PRIVATE_KEY || process.env.FIREBASE_PRIVATE_KEY)?.replace(/\\n/g, "\n");
+  const rawKey = process.env.FB_PRIVATE_KEY || process.env.FIREBASE_PRIVATE_KEY || "";
+  // Secret Manager delivers real newlines; .env.local uses escaped \n — handle both
+  const privateKey = rawKey.includes("\\n") ? rawKey.replace(/\\n/g, "\n") : rawKey;
 
-  if (!projectId || !clientEmail || !privateKey) {
-    throw new Error(
-      "Missing Firebase Admin credentials. Set FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY."
-    );
+  const storageBucket = process.env.FB_STORAGE_BUCKET || process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
+
+  if (projectId && clientEmail && privateKey) {
+    _app = initializeApp({
+      credential: cert({ projectId, clientEmail, privateKey }),
+      storageBucket,
+    });
+  } else {
+    // On Google Cloud (Firebase Functions/Cloud Run), use Application Default Credentials
+    _app = initializeApp({ projectId, storageBucket });
   }
-
-  _app = initializeApp({
-    credential: cert({ projectId, clientEmail, privateKey }),
-    storageBucket: process.env.FB_STORAGE_BUCKET || process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  });
   return _app;
 }
 
