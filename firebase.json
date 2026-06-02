@@ -8,19 +8,14 @@
     ],
     "frameworksBackend": {
       "region": "us-central1",
-      "secrets": ["FB_PRIVATE_KEY"],
+      "secrets": ["FB_PRIVATE_KEY", "RESEND_API_KEY", "CONNECTEAM_API_KEY", "QBO_CLIENT_ID", "QBO_CLIENT_SECRET", "GOOGLE_MAPS_API_KEY"],
       "environmentVariables": {
         "FB_PROJECT_ID": "stlyardgames",
         "FB_CLIENT_EMAIL": "firebase-adminsdk-fbsvc@stlyardgames.iam.gserviceaccount.com",
         "FB_STORAGE_BUCKET": "stlyardgames.firebasestorage.app",
         "NEXT_PUBLIC_APP_URL": "https://stlyardgames.com",
         "QBO_REDIRECT_BASE": "https://stlyardgames.com",
-        "GOOGLE_MAPS_API_KEY": "AIzaSyAYxXzk0VpJ_Lpcjrs9HHviD1_LYCPcZ3A",
-        "RESEND_API_KEY": "re_A7DG7u8S_NASUFJEfYnZotN5vCEJzbcvd",
-        "QBO_CLIENT_ID": "ABBoj4KDG4ZzQO83YMy6nwdWHAwUulexklWsyzqrElFcGgUY7K",
-        "QBO_CLIENT_SECRET": "M6YnjrjT2GBj8dB4kFwj74R9ZlVvF01Cy8AHddFI",
         "QBO_SANDBOX": "false",
-        "CONNECTEAM_API_KEY": "abbd17f9-ed28-4c95-93d3-bb9f4a3e080f",
         "CONNECTEAM_SCHEDULER_ID": "4385224",
         "NEXT_PUBLIC_CONNECTEAM_SCHEDULER_ID": "4385224"
       }
