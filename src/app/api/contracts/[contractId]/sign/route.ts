@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
-const { FieldValue, Timestamp } = require("firebase-admin/firestore");
+import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { publishShifts } from "@/lib/connecteam";
 
 export async function POST(

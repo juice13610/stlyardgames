@@ -10,6 +10,8 @@ const nextConfig: NextConfig = {
     "firebase-admin/firestore",
     "firebase-admin/auth",
     "firebase-admin/storage",
+    "firebase-admin/database",
+    "firebase-admin/messaging",
   ],
 };
 

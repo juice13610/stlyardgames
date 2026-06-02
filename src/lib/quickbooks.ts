@@ -2,7 +2,7 @@
 // OAuth flow: qboAuthUrl → user authorizes → /api/qbo/callback exchanges code → stores tokens
 
 import { adminDb } from "@/lib/firebase/admin";
-const { FieldValue } = require("firebase-admin/firestore");
+import { FieldValue } from "firebase-admin/firestore";
 
 const QBO_SANDBOX_BASE = "https://sandbox-quickbooks.api.intuit.com/v3/company";
 const QBO_PROD_BASE = "https://quickbooks.api.intuit.com/v3/company";

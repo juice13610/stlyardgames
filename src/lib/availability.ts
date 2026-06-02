@@ -1,7 +1,7 @@
 import { adminDb } from "@/lib/firebase/admin";
 import { GAMES } from "@/data/games";
 import { AvailabilityResult } from "@/types";
-const { Timestamp } = require("firebase-admin/firestore");
+import { Timestamp } from "firebase-admin/firestore";
 
 // Checks availability for all (or specific) items during the requested rental window.
 // An item is UNAVAILABLE only when ALL physical units are reserved.

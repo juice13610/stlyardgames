@@ -1,15 +1,15 @@
-// Use require() so Turbopack treats firebase-admin as a CommonJS external
-// and doesn't try to hash/rename it at bundle time.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const admin = require("firebase-admin");
+import { App, initializeApp, getApps, cert } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
+import { getAuth } from "firebase-admin/auth";
+import { getStorage } from "firebase-admin/storage";
 
-let _initialized = false;
+let _app: App | undefined;
 
-function getAdminApp() {
-  if (_initialized) return admin.apps[0];
-  if (admin.apps.length > 0) {
-    _initialized = true;
-    return admin.apps[0];
+function getAdminApp(): App {
+  if (_app) return _app;
+  if (getApps().length > 0) {
+    _app = getApps()[0];
+    return _app;
   }
 
   const projectId = process.env.FB_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
@@ -19,32 +19,30 @@ function getAdminApp() {
   const storageBucket = process.env.FB_STORAGE_BUCKET || process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
 
   if (projectId && clientEmail && privateKey) {
-    admin.initializeApp({
-      credential: admin.credential.cert({ projectId, clientEmail, privateKey }),
+    _app = initializeApp({
+      credential: cert({ projectId, clientEmail, privateKey }),
       storageBucket,
     });
   } else {
-    admin.initializeApp({ projectId, storageBucket });
+    _app = initializeApp({ projectId, storageBucket });
   }
-
-  _initialized = true;
-  return admin.apps[0];
+  return _app;
 }
 
-export const adminDb = new Proxy({} as ReturnType<typeof admin.firestore>, {
+export const adminDb = new Proxy({} as ReturnType<typeof getFirestore>, {
   get(_, prop) {
-    return (admin.firestore(getAdminApp()) as any)[prop];
+    return (getFirestore(getAdminApp()) as any)[prop];
   },
 });
 
-export const adminAuth = new Proxy({} as ReturnType<typeof admin.auth>, {
+export const adminAuth = new Proxy({} as ReturnType<typeof getAuth>, {
   get(_, prop) {
-    return (admin.auth(getAdminApp()) as any)[prop];
+    return (getAuth(getAdminApp()) as any)[prop];
   },
 });
 
-export const adminStorage = new Proxy({} as ReturnType<typeof admin.storage>, {
+export const adminStorage = new Proxy({} as ReturnType<typeof getStorage>, {
   get(_, prop) {
-    return (admin.storage(getAdminApp()) as any)[prop];
+    return (getStorage(getAdminApp()) as any)[prop];
   },
 });
