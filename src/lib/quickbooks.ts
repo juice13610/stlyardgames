@@ -146,10 +146,13 @@ export async function createInvoice(params: {
   memo?: string;
 }) {
   // Find or create customer and service item
-  const [customer, serviceItemId] = await Promise.all([
-    findOrCreateCustomer(params.customerName, params.email),
-    findOrCreateServiceItem(),
-  ]);
+  console.log("QBO: looking up customer:", params.customerName);
+  const customer = await findOrCreateCustomer(params.customerName, params.email);
+  console.log("QBO: customer id:", customer?.Id);
+
+  console.log("QBO: looking up service item");
+  const serviceItemId = await findOrCreateServiceItem();
+  console.log("QBO: service item id:", serviceItemId);
 
   // Spread discount proportionally across line items rather than using QBO's
   // DiscountAmt field (requires Discounts feature enabled in QBO settings)
