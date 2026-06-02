@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Send invoice email from QBO
-    await sendInvoice(invoice.Id);
+    await sendInvoice(invoice.Id, reservation.email || resData?.email);
 
     // Store invoice reference on reservation
     await adminDb.collection("reservations").doc(reservationId).update({

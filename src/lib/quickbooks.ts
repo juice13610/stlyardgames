@@ -195,12 +195,10 @@ export async function createInvoice(params: {
   const invoice: any = {
     CustomerRef: { value: customer.Id },
     Line: lineItems,
-    BillEmail: { Address: params.email },
-    EmailStatus: "NeedToSend",
   };
 
   if (params.dueDate) invoice.DueDate = params.dueDate;
-  if (params.memo) invoice.CustomerMemo = { value: params.memo };
+  if (params.memo) invoice.PrivateNote = params.memo;
 
   // QBO POST /invoice expects the object directly (not wrapped)
   const result = await qbo<any>("POST", "/invoice", invoice);
@@ -251,6 +249,9 @@ export async function getInvoices() {
   return result?.QueryResponse?.Invoice || [];
 }
 
-export async function sendInvoice(invoiceId: string) {
-  return qbo("POST", `/invoice/${invoiceId}/send`);
+export async function sendInvoice(invoiceId: string, email?: string) {
+  const path = email
+    ? `/invoice/${invoiceId}/send?sendTo=${encodeURIComponent(email)}`
+    : `/invoice/${invoiceId}/send`;
+  return qbo("POST", path);
 }
