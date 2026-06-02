@@ -256,12 +256,10 @@ async function findOrCreateCustomer(name: string, email: string) {
   if (existing) return existing;
 
   const createResult = await qbo<any>("POST", "/customer", {
-    Customer: {
-      DisplayName: name,
-      PrimaryEmailAddr: { Address: email },
-    },
+    DisplayName: name,
+    PrimaryEmailAddr: { Address: email },
   });
-  return createResult.Customer;
+  return createResult.Customer || createResult;
 }
 
 export async function getInvoices() {
