@@ -18,7 +18,8 @@
         "RESEND_API_KEY": "re_A7DG7u8S_NASUFJEfYnZotN5vCEJzbcvd",
         "QBO_CLIENT_ID": "ABBoj4KDG4ZzQO83YMy6nwdWHAwUulexklWsyzqrElFcGgUY7K",
         "QBO_CLIENT_SECRET": "M6YnjrjT2GBj8dB4kFwj74R9ZlVvF01Cy8AHddFI",
-        "QBO_SANDBOX": "false"
+        "QBO_SANDBOX": "false",
+        "CONNECTEAM_API_KEY": "abbd17f9-ed28-4c95-93d3-bb9f4a3e080f"
       }
     }
   },

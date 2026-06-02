@@ -5,7 +5,8 @@ import { db } from "@/lib/firebase/client";
 import { doc, onSnapshot, updateDoc, serverTimestamp } from "firebase/firestore";
 import { formatCurrency } from "@/lib/pricing";
 import { format } from "date-fns";
-import { Loader2, Send, FileText, CheckCircle, Copy, ExternalLink } from "lucide-react";
+import { Loader2, Send, FileText, CheckCircle, Copy, ExternalLink, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { ReservationStatus } from "@/types";
 import { use } from "react";
 
@@ -37,6 +38,7 @@ export default function ReservationDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const router = useRouter();
   const [reservation, setReservation] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [sendingContract, setSendingContract] = useState(false);
@@ -44,6 +46,7 @@ export default function ReservationDetailPage({
   const [contractNotes, setContractNotes] = useState("");
   const [message, setMessage] = useState("");
   const [createInvoiceLoading, setCreateInvoiceLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     return onSnapshot(doc(db, "reservations", id), (snap) => {
@@ -80,6 +83,20 @@ export default function ReservationDetailPage({
       });
     } finally {
       setUpdatingStatus(false);
+    }
+  }
+
+  async function deleteReservation() {
+    if (!confirm(`Delete reservation for ${reservation.customerName}? This will also delete their Connecteam shift. This cannot be undone.`)) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/reservations/${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      router.push("/admin/reservations");
+    } catch (e: any) {
+      setMessage(`Error deleting: ${e.message}`);
+      setDeleting(false);
     }
   }
 
@@ -131,13 +148,23 @@ export default function ReservationDetailPage({
           <h1 className="text-2xl font-bold text-gray-900">{reservation.customerName}</h1>
           <p className="text-gray-500">{reservation.email} · {reservation.phone}</p>
         </div>
-        <span
-          className={`px-3 py-1 rounded-full text-sm font-medium ${
-            STATUS_COLORS[reservation.status] || "bg-gray-100 text-gray-600"
-          }`}
-        >
-          {STATUS_LABELS[reservation.status as ReservationStatus] || reservation.status}
-        </span>
+        <div className="flex items-center gap-3">
+          <span
+            className={`px-3 py-1 rounded-full text-sm font-medium ${
+              STATUS_COLORS[reservation.status] || "bg-gray-100 text-gray-600"
+            }`}
+          >
+            {STATUS_LABELS[reservation.status as ReservationStatus] || reservation.status}
+          </span>
+          <button
+            onClick={deleteReservation}
+            disabled={deleting}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 rounded-lg text-sm font-medium hover:bg-red-100 disabled:opacity-50 transition-colors"
+          >
+            {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+            Delete
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
