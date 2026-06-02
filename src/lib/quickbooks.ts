@@ -208,21 +208,39 @@ export async function createInvoice(params: {
 }
 
 async function findOrCreateServiceItem(): Promise<string> {
-  // Look for an existing service/non-inventory item to use as line item ref
+  // Try Service type first
+  try {
+    const result = await qbo<any>(
+      "GET",
+      `/query?query=${encodeURIComponent("SELECT * FROM Item WHERE Type = 'Service' MAXRESULTS 1")}`
+    );
+    const item = result?.QueryResponse?.Item?.[0];
+    if (item) return item.Id;
+  } catch (e) {
+    console.error("Service item query failed:", e);
+  }
+
+  // Try NonInventory
+  try {
+    const result = await qbo<any>(
+      "GET",
+      `/query?query=${encodeURIComponent("SELECT * FROM Item WHERE Type = 'NonInventory' MAXRESULTS 1")}`
+    );
+    const item = result?.QueryResponse?.Item?.[0];
+    if (item) return item.Id;
+  } catch (e) {
+    console.error("NonInventory item query failed:", e);
+  }
+
+  // Fall back to any item at all
   const result = await qbo<any>(
     "GET",
-    `/query?query=${encodeURIComponent("SELECT * FROM Item WHERE Type IN ('Service', 'NonInventory') MAXRESULTS 1")}`
+    `/query?query=${encodeURIComponent("SELECT * FROM Item MAXRESULTS 1")}`
   );
   const item = result?.QueryResponse?.Item?.[0];
   if (item) return item.Id;
 
-  // Create a "Rental Services" item if none exist
-  const created = await qbo<any>("POST", "/item", {
-    Name: "Rental Services",
-    Type: "Service",
-    IncomeAccountRef: { name: "Services", value: "1" },
-  });
-  return created.Item.Id;
+  throw new Error("No items found in QuickBooks. Please create at least one Service item.");
 }
 
 async function findOrCreateCustomer(name: string, email: string) {
