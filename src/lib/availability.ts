@@ -1,7 +1,7 @@
 import { adminDb } from "@/lib/firebase/admin";
 import { GAMES } from "@/data/games";
 import { AvailabilityResult } from "@/types";
-import { Timestamp } from "firebase-admin/firestore";
+const { Timestamp } = require("firebase-admin/firestore");
 
 // Checks availability for all (or specific) items during the requested rental window.
 // An item is UNAVAILABLE only when ALL physical units are reserved.
@@ -22,7 +22,7 @@ export async function checkAvailability(
     .get();
 
   const overlapping = snapshot.docs
-    .map((d) => ({ id: d.id, ...d.data() }))
+    .map((d: any) => ({ id: d.id, ...d.data() }))
     .filter((r: any) => r.status !== "cancelled" && r.returnDate.toDate() > pickupDate);
 
   return games.map((game) => {

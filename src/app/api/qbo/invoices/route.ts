@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
-import { FieldValue } from "firebase-admin/firestore";
+const { FieldValue } = require("firebase-admin/firestore");
 import { createInvoice, getInvoices, sendInvoice } from "@/lib/quickbooks";
 import { sendInvoiceEmail } from "@/lib/email";
 import { format, addDays } from "date-fns";

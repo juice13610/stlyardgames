@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
-import { FieldValue, Timestamp } from "firebase-admin/firestore";
+const { FieldValue, Timestamp } = require("firebase-admin/firestore");
 import { sendContractEmail } from "@/lib/email";
 import { publishShifts } from "@/lib/connecteam";
 

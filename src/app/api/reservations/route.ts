@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { adminDb } from "@/lib/firebase/admin";
-import { FieldValue, Timestamp } from "firebase-admin/firestore";
+const { FieldValue, Timestamp } = require("firebase-admin/firestore");
 import {
   sendReservationConfirmation,
   sendOwnerNotification,
@@ -144,7 +144,7 @@ export async function GET(req: NextRequest) {
       .limit(100)
       .get();
 
-    const reservations = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const reservations = snapshot.docs.map((d: any) => ({ id: d.id, ...d.data() }));
     return Response.json({ reservations });
   } catch (e: any) {
     console.error("Reservations fetch error:", e);
