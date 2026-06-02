@@ -61,7 +61,7 @@ export interface Reservation {
   returnTime: string;
   rentalHours: number;
   // Delivery
-  deliveryType: "pickup" | "delivery";
+  deliveryType: "pickup" | "one_way" | "round_trip";
   deliveryMiles?: number;
   deliveryFee: number;
   // Items & pricing
@@ -135,7 +135,7 @@ export interface BookingFormData {
   email: string;
   phone: string;
   eventAddress: string;
-  deliveryType: "pickup" | "delivery";
+  deliveryType: "pickup" | "one_way" | "round_trip";
   pickupDate: string;
   pickupTime: string;
   returnDate: string;

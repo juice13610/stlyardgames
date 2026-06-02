@@ -25,7 +25,7 @@ export default function BookingWizard() {
   const [pickupTime, setPickupTime] = useState("10:00");
   const [returnDate, setReturnDate] = useState(twoDaysLater);
   const [returnTime, setReturnTime] = useState("10:00");
-  const [deliveryType, setDeliveryType] = useState<"pickup" | "delivery">("pickup");
+  const [deliveryType, setDeliveryType] = useState<"pickup" | "one_way" | "round_trip">("pickup");
   const [eventAddress, setEventAddress] = useState("");
   const [deliveryMiles, setDeliveryMiles] = useState(0);
   const [calculatingMiles, setCalculatingMiles] = useState(false);
@@ -43,6 +43,7 @@ export default function BookingWizard() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [eventNotes, setEventNotes] = useState("");
+  const [gameRequest, setGameRequest] = useState("");
 
   const selectedItems = GAMES.filter((g) => g.active && (quantities[g.id] || 0) > 0).map(
     (g) => ({
@@ -73,7 +74,7 @@ export default function BookingWizard() {
 
   // Calculate delivery miles via Google Maps when address changes
   async function calculateDelivery(address: string) {
-    if (!address || deliveryType !== "delivery") return;
+    if (!address || deliveryType === "pickup") return;
     setCalculatingMiles(true);
     try {
       const res = await fetch("/api/distance", {
@@ -97,11 +98,11 @@ export default function BookingWizard() {
       setError("Please enter pickup and return dates.");
       return;
     }
-    if (deliveryType === "delivery" && !eventAddress.trim()) {
+    if (deliveryType !== "pickup" && !eventAddress.trim()) {
       setError("Please enter your event address for delivery.");
       return;
     }
-    if (deliveryType === "delivery" && deliveryMiles === 0) {
+    if (deliveryType !== "pickup" && deliveryMiles === 0) {
       await calculateDelivery(eventAddress);
     }
 
@@ -172,6 +173,7 @@ export default function BookingWizard() {
           grandTotal: pricing.grandTotal,
           rentalHours,
           eventNotes,
+          gameRequest: gameRequest || undefined,
         }),
       });
       const data = await res.json();
@@ -240,7 +242,7 @@ export default function BookingWizard() {
                   value={pickupDate}
                   min={today}
                   onChange={(e) => setPickupDate(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
               <div>
@@ -249,7 +251,7 @@ export default function BookingWizard() {
                   type="time"
                   value={pickupTime}
                   onChange={(e) => setPickupTime(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
               <div>
@@ -259,7 +261,7 @@ export default function BookingWizard() {
                   value={returnDate}
                   min={pickupDate}
                   onChange={(e) => setReturnDate(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
               <div>
@@ -268,17 +270,17 @@ export default function BookingWizard() {
                   type="time"
                   value={returnTime}
                   onChange={(e) => setReturnTime(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Delivery Option *</label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <button
                   type="button"
-                  onClick={() => setDeliveryType("pickup")}
+                  onClick={() => { setDeliveryType("pickup"); setDeliveryMiles(0); }}
                   className={`border-2 rounded-xl p-4 text-left transition-all ${
                     deliveryType === "pickup"
                       ? "border-green-700 bg-green-50"
@@ -286,26 +288,39 @@ export default function BookingWizard() {
                   }`}
                 >
                   <div className="font-semibold text-gray-900">🏠 Free Pickup</div>
-                  <div className="text-sm text-gray-500 mt-1">Pick up &amp; return in St. Peters, MO</div>
+                  <div className="text-sm text-gray-600 mt-1">You pick up &amp; return in St. Peters, MO</div>
                   <div className="text-sm font-bold text-green-700 mt-1">Free</div>
                 </button>
                 <button
                   type="button"
-                  onClick={() => setDeliveryType("delivery")}
+                  onClick={() => setDeliveryType("one_way")}
                   className={`border-2 rounded-xl p-4 text-left transition-all ${
-                    deliveryType === "delivery"
+                    deliveryType === "one_way"
                       ? "border-green-700 bg-green-50"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
                 >
-                  <div className="font-semibold text-gray-900">🚚 Delivery</div>
-                  <div className="text-sm text-gray-500 mt-1">We bring it to your event address</div>
-                  <div className="text-sm font-bold text-green-700 mt-1">Starting at $15/way</div>
+                  <div className="font-semibold text-gray-900">🚚 One-Way Delivery</div>
+                  <div className="text-sm text-gray-600 mt-1">We deliver to you; you return to St. Peters — or vice versa</div>
+                  <div className="text-sm font-bold text-green-700 mt-1">From $15 (one direction)</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeliveryType("round_trip")}
+                  className={`border-2 rounded-xl p-4 text-left transition-all ${
+                    deliveryType === "round_trip"
+                      ? "border-green-700 bg-green-50"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <div className="font-semibold text-gray-900">🔄 Round Trip Delivery</div>
+                  <div className="text-sm text-gray-600 mt-1">We deliver &amp; pick up — you never leave your event</div>
+                  <div className="text-sm font-bold text-green-700 mt-1">From $30 (both directions)</div>
                 </button>
               </div>
             </div>
 
-            {deliveryType === "delivery" && (
+            {deliveryType !== "pickup" && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   <MapPin size={14} className="inline mr-1" />
@@ -317,7 +332,7 @@ export default function BookingWizard() {
                   onChange={(e) => setEventAddress(e.target.value)}
                   onBlur={() => calculateDelivery(eventAddress)}
                   placeholder="123 Main St, St. Louis, MO 63101"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
                 {calculatingMiles && (
                   <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
@@ -325,10 +340,10 @@ export default function BookingWizard() {
                   </p>
                 )}
                 {deliveryMiles > 0 && !calculatingMiles && (
-                  <div className="mt-2 text-sm bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
-                    <strong>{deliveryMiles.toFixed(1)} miles</strong> from St. Peters · Delivery:{" "}
-                    <strong>{formatCurrency(pricing.deliveryFee)}</strong> each way (
-                    {formatCurrency(pricing.deliveryTotal)} round trip)
+                  <div className="mt-2 text-sm bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-gray-900">
+                    <strong>{deliveryMiles.toFixed(1)} miles</strong> from St. Peters ·{" "}
+                    <strong>{formatCurrency(pricing.deliveryFee)}</strong> per direction ·{" "}
+                    Your total delivery: <strong>{formatCurrency(pricing.deliveryTotal)}</strong>
                   </div>
                 )}
                 {deliveryMiles > 60 && (
@@ -382,14 +397,13 @@ export default function BookingWizard() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="font-semibold text-gray-900">{game.displayName}</span>
-                        {unavailable && (
-                          <span className="text-xs bg-red-100 text-red-700 rounded px-2 py-0.5">
+                        {unavailable ? (
+                          <span className="text-xs bg-red-100 text-red-700 rounded px-2 py-0.5 font-medium">
                             Unavailable
                           </span>
-                        )}
-                        {!unavailable && avail <= 1 && avail > 0 && (
-                          <span className="text-xs bg-amber-100 text-amber-700 rounded px-2 py-0.5">
-                            1 left
+                        ) : (
+                          <span className="text-xs bg-green-100 text-green-700 rounded px-2 py-0.5 font-medium">
+                            Available
                           </span>
                         )}
                       </div>
@@ -407,7 +421,7 @@ export default function BookingWizard() {
                       >
                         <Minus size={14} />
                       </button>
-                      <span className="w-6 text-center font-bold">{qty}</span>
+                      <span className="w-6 text-center font-bold text-gray-900">{qty}</span>
                       <button
                         onClick={() => setQty(game.id, 1)}
                         disabled={unavailable || qty >= avail}
@@ -419,6 +433,20 @@ export default function BookingWizard() {
                   </div>
                 );
               })}
+            </div>
+
+            <div className="border border-dashed border-gray-300 rounded-xl p-4 bg-gray-50">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Don't see what you're looking for?
+              </label>
+              <input
+                type="text"
+                value={gameRequest}
+                onChange={(e) => setGameRequest(e.target.value)}
+                placeholder="Request a game (e.g. Giant Chess, Spikeball, Bocce Ball…)"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+              />
+              <p className="text-xs text-gray-400 mt-1">We'll do our best to accommodate — we'll reach out if we can make it happen.</p>
             </div>
 
             {error && <p className="text-red-600 text-sm">{error}</p>}
@@ -459,7 +487,7 @@ export default function BookingWizard() {
                   type="text"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
               <div>
@@ -468,7 +496,7 @@ export default function BookingWizard() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
               <div>
@@ -477,7 +505,7 @@ export default function BookingWizard() {
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
               <div className="sm:col-span-2">
@@ -489,7 +517,7 @@ export default function BookingWizard() {
                   onChange={(e) => setEventNotes(e.target.value)}
                   rows={3}
                   placeholder="Event details, special instructions, anything we should know..."
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
                 />
               </div>
             </div>
@@ -528,25 +556,31 @@ export default function BookingWizard() {
             <div className="bg-gray-50 rounded-xl p-4 space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-500">Pickup</span>
-                <span>{pickupDate} at {pickupTime}</span>
+                <span className="text-gray-900">{pickupDate} at {pickupTime}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Return</span>
-                <span>{returnDate} at {returnTime}</span>
+                <span className="text-gray-900">{returnDate} at {returnTime}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Delivery</span>
-                <span>{deliveryType === "pickup" ? "Pickup in St. Peters" : eventAddress}</span>
+                <span className="text-gray-900">
+                  {deliveryType === "pickup"
+                    ? "Free Pickup in St. Peters"
+                    : deliveryType === "one_way"
+                    ? `One-Way — ${eventAddress}`
+                    : `Round Trip — ${eventAddress}`}
+                </span>
               </div>
             </div>
 
             <div className="space-y-2">
               {pricing.items.map((item) => (
                 <div key={item.inventoryId} className="flex justify-between text-sm">
-                  <span>
+                  <span className="text-gray-900">
                     {item.quantity}× {item.displayName}
                   </span>
-                  <span>{formatCurrency(item.quantity * item.unitPrice)}</span>
+                  <span className="text-gray-900">{formatCurrency(item.quantity * item.unitPrice)}</span>
                 </div>
               ))}
               {pricing.discountTotal > 0 && (
@@ -557,21 +591,24 @@ export default function BookingWizard() {
               )}
               {pricing.deliveryTotal > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span>Delivery ({formatCurrency(pricing.deliveryFee)} × each way)</span>
-                  <span>{formatCurrency(pricing.deliveryTotal)}</span>
+                  <span className="text-gray-900">
+                    Delivery ({formatCurrency(pricing.deliveryFee)}/direction ×{" "}
+                    {deliveryType === "round_trip" ? "2" : "1"})
+                  </span>
+                  <span className="text-gray-900">{formatCurrency(pricing.deliveryTotal)}</span>
                 </div>
               )}
               {pricing.additionalHoursCharge > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span>Extended rental charge</span>
-                  <span>{formatCurrency(pricing.additionalHoursCharge)}</span>
+                  <span className="text-gray-900">Extended rental charge</span>
+                  <span className="text-gray-900">{formatCurrency(pricing.additionalHoursCharge)}</span>
                 </div>
               )}
               <div className="flex justify-between font-bold text-lg border-t pt-2 mt-2">
-                <span>Estimated Total</span>
+                <span className="text-gray-900">Estimated Total</span>
                 <span className="text-green-700">{formatCurrency(pricing.grandTotal)}</span>
               </div>
-              <p className="text-xs text-gray-400">Final pricing confirmed when we send your agreement.</p>
+              <p className="text-xs text-gray-500">Final pricing confirmed when we send your agreement.</p>
             </div>
 
             <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-800">

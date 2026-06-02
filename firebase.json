@@ -7,7 +7,16 @@
       "**/node_modules/**"
     ],
     "frameworksBackend": {
-      "region": "us-central1"
+      "region": "us-central1",
+      "secrets": ["FB_PRIVATE_KEY"],
+      "environmentVariables": {
+        "FB_PROJECT_ID": "stlyardgames",
+        "FB_CLIENT_EMAIL": "firebase-adminsdk-fbsvc@stlyardgames.iam.gserviceaccount.com",
+        "FB_STORAGE_BUCKET": "stlyardgames.firebasestorage.app",
+        "NEXT_PUBLIC_APP_URL": "https://stlyardgames.web.app",
+        "GOOGLE_MAPS_API_KEY": "AIzaSyAYxXzk0VpJ_Lpcjrs9HHviD1_LYCPcZ3A",
+        "RESEND_API_KEY": "re_A7DG7u8S_NASUFJEfYnZotN5vCEJzbcvd"
+      }
     }
   },
   "firestore": {

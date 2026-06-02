@@ -51,7 +51,7 @@ export interface PricingBreakdown {
 
 export function calculatePricing(
   selectedItems: { inventoryId: string; displayName: string; price: number; quantity: number }[],
-  deliveryType: "pickup" | "delivery",
+  deliveryType: "pickup" | "one_way" | "round_trip",
   miles: number,
   rentalHours: number,
   pricing: PricingSettings = DEFAULT_PRICING
@@ -80,9 +80,9 @@ export function calculatePricing(
   const additionalHours = Math.max(0, rentalHours - pricing.baseRentalHours);
   const additionalHoursCharge = additionalHours * pricing.additionalHourlyRate * itemCount;
 
-  // Delivery is charged each way (to event + return pickup)
-  const oneWayFee = deliveryType === "delivery" ? getDeliveryFee(miles, pricing) : 0;
-  const deliveryTotal = oneWayFee * 2;
+  const oneWayFee = deliveryType !== "pickup" ? getDeliveryFee(miles, pricing) : 0;
+  const directions = deliveryType === "round_trip" ? 2 : deliveryType === "one_way" ? 1 : 0;
+  const deliveryTotal = oneWayFee * directions;
 
   const grandTotal =
     Math.round((subtotal - discountTotal + deliveryTotal + additionalHoursCharge) * 100) / 100;

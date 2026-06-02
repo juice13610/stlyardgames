@@ -8,17 +8,18 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div>
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-4 mb-4">
               <Image
                 src="/stlyardgames.png"
                 alt="STL Yard Games"
-                width={56}
-                height={56}
-                className="rounded-full"
+                width={88}
+                height={88}
+                className="rounded-full ring-2 ring-green-600 shadow-lg"
               />
               <div>
-                <div className="font-bold text-white text-lg leading-tight">STL Yard Games</div>
+                <div className="font-bold text-white text-xl leading-tight">STL Yard Games</div>
                 <div className="text-green-300 text-sm">St. Peters, MO</div>
+                <div className="text-green-400 text-xs mt-0.5">stlyardgames.com</div>
               </div>
             </div>
             <p className="text-green-200 text-sm leading-relaxed">

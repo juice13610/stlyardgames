@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
     return Response.json({ id: reservationId, status: "inquiry" }, { status: 201 });
   } catch (e: any) {
     console.error("Reservation creation error:", e);
-    return Response.json({ error: "Failed to create reservation" }, { status: 500 });
+    return Response.json({ error: e?.message || "Failed to create reservation" }, { status: 500 });
   }
 }
 

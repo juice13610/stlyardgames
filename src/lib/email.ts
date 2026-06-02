@@ -33,7 +33,7 @@ export async function sendReservationConfirmation(reservation: Reservation & { i
   <table style="width:100%;border-collapse:collapse;font-size:14px">
     <tr><td style="padding:6px 0;color:#666">Pickup Date</td><td>${new Date((reservation.pickupDate as any).toDate?.() || reservation.pickupDate).toLocaleDateString()}</td></tr>
     <tr><td style="padding:6px 0;color:#666">Return Date</td><td>${new Date((reservation.returnDate as any).toDate?.() || reservation.returnDate).toLocaleDateString()}</td></tr>
-    <tr><td style="padding:6px 0;color:#666">Delivery</td><td>${reservation.deliveryType === "delivery" ? reservation.eventAddress : "Customer Pickup (St. Peters)"}</td></tr>
+    <tr><td style="padding:6px 0;color:#666">Delivery</td><td>${reservation.deliveryType === "pickup" ? "Customer Pickup (St. Peters)" : reservation.deliveryType === "one_way" ? `One-Way — ${reservation.eventAddress}` : `Round Trip — ${reservation.eventAddress}`}</td></tr>
   </table>
 
   <h3 style="color:#166534">Items Requested</h3>
@@ -68,7 +68,7 @@ export async function sendOwnerNotification(reservation: Reservation & { id: str
   <p><strong>Items:</strong> ${itemsList}</p>
   <p><strong>Pickup:</strong> ${new Date((reservation.pickupDate as any).toDate?.() || reservation.pickupDate).toLocaleDateString()}</p>
   <p><strong>Return:</strong> ${new Date((reservation.returnDate as any).toDate?.() || reservation.returnDate).toLocaleDateString()}</p>
-  <p><strong>Delivery:</strong> ${reservation.deliveryType === "delivery" ? reservation.eventAddress : "Customer Pickup"}</p>
+  <p><strong>Delivery:</strong> ${reservation.deliveryType === "pickup" ? "Customer Pickup (St. Peters)" : reservation.deliveryType === "one_way" ? `One-Way — ${reservation.eventAddress}` : `Round Trip — ${reservation.eventAddress}`}</p>
   <p><strong>Estimated Total:</strong> ${formatCurrency(reservation.grandTotal)}</p>
   ${reservation.eventNotes ? `<p><strong>Notes:</strong> ${reservation.eventNotes}</p>` : ""}
   <hr/>

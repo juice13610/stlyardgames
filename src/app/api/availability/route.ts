@@ -20,6 +20,6 @@ export async function POST(req: NextRequest) {
     return Response.json({ results });
   } catch (e: any) {
     console.error("Availability check error:", e);
-    return Response.json({ error: "Failed to check availability" }, { status: 500 });
+    return Response.json({ error: e?.message || "Failed to check availability" }, { status: 500 });
   }
 }

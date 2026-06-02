@@ -21,15 +21,15 @@ export default function HomePage() {
             <div className="inline-flex items-center gap-2 bg-green-900/40 rounded-full px-4 py-1.5 text-green-200 text-sm font-medium mb-6">
               <MapPin size={14} /> St. Peters, MO — Serving All of St. Louis
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6 text-white drop-shadow">
               Yard Games That Make Your Party{" "}
               <span className="text-yellow-300">Unforgettable</span>
             </h1>
-            <p className="text-lg sm:text-xl text-green-100 mb-4 max-w-2xl">
+            <p className="text-lg sm:text-xl text-white mb-4 max-w-2xl font-medium">
               Rent premium outdoor games for your next backyard bash, graduation party, corporate event, or family gathering — at prices up to{" "}
               <span className="text-yellow-300 font-bold">54% less</span> than the competition.
             </p>
-            <p className="text-green-200 text-sm mb-8">
+            <p className="text-white text-sm mb-8 font-medium">
               Free pickup in St. Peters · 48-hour rentals · Delivery available throughout the St. Louis metro
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -70,12 +70,12 @@ export default function HomePage() {
       </section>
 
       {/* Game catalog */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <section className="bg-white max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             Our Game Lineup
           </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <p className="text-gray-800 max-w-2xl mx-auto">
             All games include everything you need to play — no extras, no surprises. Just show up and have fun.
           </p>
         </div>
@@ -93,12 +93,11 @@ export default function HomePage() {
                   width={200}
                   height={150}
                   className="object-contain h-40 w-auto group-hover:scale-105 transition-transform"
-                  onError={() => {}} // graceful fallback handled by placeholder below
                 />
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-lg text-gray-900 mb-1">{game.displayName}</h3>
-                <p className="text-gray-500 text-sm mb-3 line-clamp-2">{game.tagline}</p>
+                <p className="text-gray-700 text-sm mb-3 line-clamp-2">{game.tagline}</p>
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold text-green-700">
                     {formatCurrency(game.price)}
@@ -127,7 +126,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
-            <p className="text-gray-600">Easy as 1, 2, 3</p>
+            <p className="text-gray-800">Easy as 1, 2, 3</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
@@ -156,7 +155,7 @@ export default function HomePage() {
                 </div>
                 <div className="text-3xl mb-3">{item.icon}</div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-gray-600">{item.desc}</p>
+                <p className="text-gray-800">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -226,21 +225,7 @@ export default function HomePage() {
           <p className="text-green-200 mb-8 max-w-2xl mx-auto">
             Based in St. Peters, MO (63376) — we serve the entire greater St. Louis area. Free pickup always available.
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-            {[
-              { range: "0–5 miles", price: "$15/way", note: "St. Peters nearby" },
-              { range: "5–15 miles", price: "$35/way", note: "St. Charles, O'Fallon" },
-              { range: "15–30 miles", price: "$45/way", note: "St. Louis, Chesterfield" },
-              { range: "30–60 miles", price: "$75/way", note: "Extended metro area" },
-            ].map((tier) => (
-              <div key={tier.range} className="bg-green-700 rounded-xl p-4">
-                <div className="font-bold text-yellow-300 text-lg">{tier.price}</div>
-                <div className="text-sm font-medium text-white">{tier.range}</div>
-                <div className="text-xs text-green-300 mt-1">{tier.note}</div>
-              </div>
-            ))}
-          </div>
-          <p className="text-green-300 text-sm mt-4">Delivery pricing is per direction. Free pickup in St. Peters — always.</p>
+          <p className="text-white text-lg font-medium">Delivery starts at just <span className="text-yellow-300 font-bold">$15</span> — or pick up for free in St. Peters.</p>
           <div className="mt-8">
             <Link
               href="/book"
