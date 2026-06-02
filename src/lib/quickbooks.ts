@@ -120,8 +120,11 @@ async function qbo<T>(method: string, path: string, body?: unknown): Promise<T> 
   });
   const data = await res.json();
   if (!res.ok) {
-    const msg = data?.Fault?.Error?.[0]?.Message || "QuickBooks API error";
-    throw new Error(msg);
+    console.error("QBO API error:", JSON.stringify(data));
+    const fault = data?.Fault?.Error?.[0];
+    const msg = fault?.Message || fault?.Detail || "QuickBooks API error";
+    const detail = fault?.Detail ? ` — ${fault.Detail}` : "";
+    throw new Error(`${msg}${detail}`);
   }
   return data;
 }
@@ -164,16 +167,15 @@ export async function createInvoice(params: {
       ? Math.round(l.unitPrice * (1 - discountRatio) * 100) / 100
       : l.unitPrice;
     return {
-      LineNum: i + 1,
       Amount: discountedAmount,
       DetailType: "SalesItemLineDetail",
       Description: discountRatio > 0
         ? `${l.description || l.displayName} (multi-game discount applied)`
         : (l.description || l.displayName),
       SalesItemLineDetail: {
+        ItemRef: { value: serviceItemId },
         Qty: l.quantity,
         UnitPrice: effectiveUnitPrice,
-        ItemRef: { value: serviceItemId },
       },
     };
   });
@@ -197,8 +199,8 @@ export async function createInvoice(params: {
     Line: lineItems,
   };
 
-  if (params.dueDate) invoice.DueDate = params.dueDate;
-  if (params.memo) invoice.PrivateNote = params.memo;
+  // Log what we're sending for debugging
+  console.log("QBO invoice payload:", JSON.stringify(invoice));
 
   // QBO POST /invoice expects the object directly (not wrapped)
   const result = await qbo<any>("POST", "/invoice", invoice);
