@@ -5,6 +5,10 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://stlyardgames.com"),
+  alternates: {
+    canonical: "https://stlyardgames.com",
+  },
   title: "STL Yard Games — Yard Game Rentals in St. Peters, MO",
   description:
     "Rent premium yard games for your next party, corporate event, graduation, or family gathering in the St. Louis area. Cornhole, Giant Jenga, Connect Four, PutterBall, and more.",
@@ -18,7 +22,31 @@ export const metadata: Metadata = {
     siteName: "STL Yard Games",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: "/stlyardgames.png",
+        width: 1200,
+        height: 630,
+        alt: "STL Yard Games — Yard Game Rentals in St. Peters, MO",
+      },
+    ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "STL Yard Games — Yard Game Rentals",
+    description:
+      "Premium yard game rentals for any occasion in the St. Louis area.",
+    images: ["/stlyardgames.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
+  // verification: { google: "YOUR_GOOGLE_SEARCH_CONSOLE_TOKEN_HERE" },
 };
 
 export default function RootLayout({

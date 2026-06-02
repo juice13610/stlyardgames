@@ -1,14 +1,123 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { CheckCircle, MapPin, Clock, DollarSign, Star, ArrowRight } from "lucide-react";
 import { getActiveGames } from "@/data/games";
 import { formatCurrency } from "@/lib/pricing";
 
+export const metadata: Metadata = {
+  title: "STL Yard Games — Yard Game Rentals in St. Peters & St. Louis, MO",
+  description:
+    "STL Yard Games offers affordable yard game rentals in St. Peters, MO and the greater St. Louis area. Rent cornhole, giant jenga, giant connect four, ladder ball, washer toss, and PutterBall for graduation parties, corporate events, backyard BBQs, church picnics, school events, and festivals. 48-hour rentals with free pickup in St. Peters. Outdoor game rentals and party game rentals at prices up to 54% less than competitors. Serving St. Peters, O'Fallon, Wentzville, St. Charles, Chesterfield, Ballwin, and all of the St. Louis metro.",
+  keywords: [
+    "yard game rentals St. Louis",
+    "cornhole rental St. Louis",
+    "giant jenga rental St. Louis",
+    "yard games St. Peters MO",
+    "party game rentals St. Louis",
+    "outdoor game rentals Missouri",
+    "graduation party games rental",
+    "corporate event game rentals",
+    "48-hour rentals yard games",
+    "ladder ball rental",
+    "washer toss rental",
+    "giant connect four rental",
+    "PutterBall rental",
+    "backyard game rentals St. Peters",
+    "STL yard games",
+    "St. Charles County yard games",
+  ],
+  alternates: {
+    canonical: "https://stlyardgames.com",
+  },
+  openGraph: {
+    title: "STL Yard Games — Yard Game Rentals in St. Peters & St. Louis, MO",
+    description:
+      "Rent cornhole, giant jenga, giant connect four, ladder ball, and more for graduation parties, corporate events, and backyard BBQs. 48-hour rentals from St. Peters, MO. Up to 54% cheaper than competitors.",
+    url: "https://stlyardgames.com",
+    siteName: "STL Yard Games",
+    locale: "en_US",
+    type: "website",
+    images: [
+      {
+        url: "/stlyardgames.png",
+        width: 1200,
+        height: 630,
+        alt: "STL Yard Games — Yard Game Rentals in St. Peters & St. Louis, MO",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "STL Yard Games — Yard Game Rentals in St. Peters & St. Louis, MO",
+    description:
+      "Rent cornhole, giant jenga, giant connect four, ladder ball, and more for graduation parties and corporate events in the St. Louis area.",
+    images: ["/stlyardgames.png"],
+  },
+};
+
+const localBusinessJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  name: "STL Yard Games",
+  description:
+    "Premium yard game rentals in St. Peters, MO serving the greater St. Louis area. Rent cornhole, giant jenga, giant connect four, ladder ball, washer toss, and PutterBall for any event.",
+  url: "https://stlyardgames.com",
+  telephone: "",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "St. Peters",
+    addressRegion: "MO",
+    postalCode: "63376",
+    addressCountry: "US",
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: 38.787,
+    longitude: -90.628,
+  },
+  areaServed: {
+    "@type": "GeoCircle",
+    geoMidpoint: {
+      "@type": "GeoCoordinates",
+      latitude: 38.787,
+      longitude: -90.628,
+    },
+    geoRadius: "50000",
+  },
+  priceRange: "$$",
+  openingHoursSpecification: [],
+  sameAs: [],
+};
+
+const gamesItemListJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "STL Yard Games — Available Rentals",
+  url: "https://stlyardgames.com/games",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Cornhole Rental", url: "https://stlyardgames.com/games/cornhole" },
+    { "@type": "ListItem", position: 2, name: "Giant Jenga Rental", url: "https://stlyardgames.com/games/giant-jenga" },
+    { "@type": "ListItem", position: 3, name: "Giant Connect Four Rental", url: "https://stlyardgames.com/games/giant-connect-four" },
+    { "@type": "ListItem", position: 4, name: "Ladder Ball Rental", url: "https://stlyardgames.com/games/ladder-ball" },
+    { "@type": "ListItem", position: 5, name: "Washer Toss Rental", url: "https://stlyardgames.com/games/washer-toss" },
+    { "@type": "ListItem", position: 6, name: "PutterBall Rental", url: "https://stlyardgames.com/games/putterball" },
+  ],
+};
+
 export default function HomePage() {
   const games = getActiveGames();
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(gamesItemListJsonLd) }}
+      />
       {/* Hero */}
       <section className="relative bg-gradient-to-br from-green-800 via-green-700 to-emerald-600 text-white overflow-hidden">
         <div className="absolute inset-0 opacity-10">

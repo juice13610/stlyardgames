@@ -14,9 +14,35 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const game = getGameBySlug(slug);
   if (!game) return {};
+  const title = `${game.displayName} Rental in St. Louis, MO — STL Yard Games`;
+  const description = `Rent ${game.displayName} in the St. Peters & St. Louis, MO area. ${game.tagline}. ${game.description.slice(0, 120)}... 48-hour rentals starting at ${formatCurrency(game.price)}.`;
+  const url = `https://stlyardgames.com/games/${game.slug}`;
   return {
-    title: `${game.displayName} Rental — STL Yard Games`,
-    description: `Rent ${game.displayName} in the St. Louis area. ${game.tagline}. Starting at ${formatCurrency(game.price)} for 48 hours.`,
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: "STL Yard Games",
+      locale: "en_US",
+      type: "website",
+      images: [
+        {
+          url: "/stlyardgames.png",
+          width: 1200,
+          height: 630,
+          alt: `${game.displayName} Rental — STL Yard Games`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["/stlyardgames.png"],
+    },
   };
 }
 
@@ -25,8 +51,45 @@ export default async function GamePage({ params }: { params: Promise<{ slug: str
   const game = getGameBySlug(slug);
   if (!game) notFound();
 
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: `${game.displayName} Rental`,
+    description: game.description,
+    url: `https://stlyardgames.com/games/${game.slug}`,
+    image: game.images[0]
+      ? `https://stlyardgames.com${game.images[0]}`
+      : "https://stlyardgames.com/stlyardgames.png",
+    brand: {
+      "@type": "Brand",
+      name: "STL Yard Games",
+    },
+    offers: {
+      "@type": "Offer",
+      price: game.price.toFixed(2),
+      priceCurrency: "USD",
+      availability: "https://schema.org/InStock",
+      url: `https://stlyardgames.com/games/${game.slug}`,
+      seller: {
+        "@type": "LocalBusiness",
+        name: "STL Yard Games",
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "St. Peters",
+          addressRegion: "MO",
+          postalCode: "63376",
+          addressCountry: "US",
+        },
+      },
+    },
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-500 mb-6 flex items-center gap-2">
         <Link href="/" className="hover:text-green-700">Home</Link>
