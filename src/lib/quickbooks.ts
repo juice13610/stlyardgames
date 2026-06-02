@@ -145,24 +145,42 @@ export async function createInvoice(params: {
   // Find or create customer
   const customer = await findOrCreateCustomer(params.customerName, params.email);
 
-  const lineItems: any[] = params.lines.map((l, i) => ({
-    LineNum: i + 1,
-    Amount: Math.round(l.unitPrice * l.quantity * 100) / 100,
-    DetailType: "SalesItemLineDetail",
-    Description: l.description || l.displayName,
-    SalesItemLineDetail: {
-      Qty: l.quantity,
-      UnitPrice: l.unitPrice,
-      ItemRef: { value: "1", name: "Services" }, // Default service item
-    },
-  }));
+  // Spread discount proportionally across line items rather than using QBO's
+  // DiscountAmt field (requires Discounts feature enabled in QBO settings)
+  const discountRatio =
+    params.discountTotal && params.discountTotal > 0
+      ? params.discountTotal / params.lines.reduce((s, l) => s + l.unitPrice * l.quantity, 0)
+      : 0;
+
+  const lineItems: any[] = params.lines.map((l, i) => {
+    const baseAmount = Math.round(l.unitPrice * l.quantity * 100) / 100;
+    const discountedAmount = discountRatio > 0
+      ? Math.round(baseAmount * (1 - discountRatio) * 100) / 100
+      : baseAmount;
+    const effectiveUnitPrice = discountRatio > 0
+      ? Math.round(l.unitPrice * (1 - discountRatio) * 100) / 100
+      : l.unitPrice;
+    return {
+      LineNum: i + 1,
+      Amount: discountedAmount,
+      DetailType: "SalesItemLineDetail",
+      Description: discountRatio > 0
+        ? `${l.description || l.displayName} (multi-game discount applied)`
+        : (l.description || l.displayName),
+      SalesItemLineDetail: {
+        Qty: l.quantity,
+        UnitPrice: effectiveUnitPrice,
+        ItemRef: { value: "1", name: "Services" },
+      },
+    };
+  });
 
   if (params.deliveryTotal && params.deliveryTotal > 0) {
     lineItems.push({
       LineNum: lineItems.length + 1,
       Amount: params.deliveryTotal,
       DetailType: "SalesItemLineDetail",
-      Description: "Delivery (round trip)",
+      Description: "Delivery",
       SalesItemLineDetail: {
         Qty: 1,
         UnitPrice: params.deliveryTotal,
@@ -181,12 +199,8 @@ export async function createInvoice(params: {
   if (params.dueDate) invoice.DueDate = params.dueDate;
   if (params.memo) invoice.CustomerMemo = { value: params.memo };
 
-  if (params.discountTotal && params.discountTotal > 0) {
-    invoice.GlobalTaxCalculation = "NotApplicable";
-    invoice.DiscountAmt = params.discountTotal;
-  }
-
-  const result = await qbo<any>("POST", "/invoice", { Invoice: invoice });
+  // QBO POST /invoice expects the object directly (not wrapped)
+  const result = await qbo<any>("POST", "/invoice", invoice);
   return result.Invoice;
 }
 
