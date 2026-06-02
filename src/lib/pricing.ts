@@ -106,7 +106,7 @@ export function calculatePricing(
 
   // Extra hours charge (beyond base rental period)
   const additionalHours = Math.max(0, rentalHours - pricing.baseRentalHours);
-  const additionalHoursCharge = additionalHours * pricing.additionalHourlyRate * itemCount;
+  const additionalHoursCharge = additionalHours * pricing.additionalHourlyRate * units.length;
 
   const oneWayFee = deliveryType !== "pickup" ? getDeliveryFee(miles, pricing) : 0;
   const directions = deliveryType === "round_trip" ? 2 : deliveryType === "one_way" ? 1 : 0;
