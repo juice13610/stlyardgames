@@ -89,9 +89,9 @@ export async function POST(
         }
 
         await adminDb.collection("reservations").doc(contract.reservationId).update({
-          qboInvoiceId: invoice.Id,
+          qboInvoiceId: invoice.Id || "",
           qboInvoiceUrl: invoice.InvoiceLink || "",
-          qboDocNumber: invoice.DocNumber,
+          qboDocNumber: invoice.DocNumber || invoice.Id || "",
           status: "invoiced",
           updatedAt: FieldValue.serverTimestamp(),
         });

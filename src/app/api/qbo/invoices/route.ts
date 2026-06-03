@@ -55,11 +55,14 @@ export async function POST(req: NextRequest) {
       console.error("QBO sendInvoice failed (non-fatal):", sendErr);
     }
 
+    // Log invoice response for debugging
+    console.log("QBO invoice created:", JSON.stringify(invoice));
+
     // Store invoice reference on reservation
     await adminDb.collection("reservations").doc(reservationId).update({
-      qboInvoiceId: invoice.Id,
+      qboInvoiceId: invoice.Id || "",
       qboInvoiceUrl: invoice.InvoiceLink || "",
-      qboDocNumber: invoice.DocNumber,
+      qboDocNumber: invoice.DocNumber || invoice.Id || "",
       status: "invoiced",
       updatedAt: FieldValue.serverTimestamp(),
     });
