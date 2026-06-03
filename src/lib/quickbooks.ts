@@ -200,6 +200,8 @@ export async function createInvoice(params: {
   const invoice: any = {
     CustomerRef: { value: customer.Id },
     Line: lineItems,
+    BillEmail: { Address: params.email },
+    EmailStatus: "NeedToSend",
   };
 
   // Log what we're sending for debugging

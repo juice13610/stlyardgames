@@ -82,7 +82,11 @@ export async function POST(
           memo: `STL Yard Games rental — pickup ${format(pickupDate, "MMM d")}`,
         });
 
-        await sendInvoice(invoice.Id, resData?.email);
+        try {
+          await sendInvoice(invoice.Id, resData?.email);
+        } catch (sendErr) {
+          console.error("QBO sendInvoice failed (non-fatal):", sendErr);
+        }
 
         await adminDb.collection("reservations").doc(contract.reservationId).update({
           qboInvoiceId: invoice.Id,

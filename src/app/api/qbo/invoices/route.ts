@@ -48,8 +48,12 @@ export async function POST(req: NextRequest) {
       memo: `STL Yard Games rental — pickup ${format(reservation.pickupDate.toDate(), "MMM d")}`,
     });
 
-    // Send invoice email from QBO
-    await sendInvoice(invoice.Id, reservation.email);
+    // Send invoice email from QBO (best-effort)
+    try {
+      await sendInvoice(invoice.Id, reservation.email);
+    } catch (sendErr) {
+      console.error("QBO sendInvoice failed (non-fatal):", sendErr);
+    }
 
     // Store invoice reference on reservation
     await adminDb.collection("reservations").doc(reservationId).update({
