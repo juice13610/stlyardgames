@@ -124,21 +124,23 @@ export async function sendInvoiceEmail(
   await resend.emails.send({
     from: FROM_EMAIL,
     to: reservation.email,
-    subject: `STL Yard Games Invoice #${invoiceNumber}`,
+    subject: invoiceNumber ? `STL Yard Games Invoice #${invoiceNumber}` : `STL Yard Games Invoice`,
     html: `
 <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
   <img src="https://stlyardgames.com/stlyardgames.png" alt="STL Yard Games" width="120" style="margin-bottom:16px"/>
   <h2 style="color:#166534">Your Invoice is Ready</h2>
   <p>Hi ${reservation.customerName},</p>
   <p>Your rental agreement has been signed — thank you! Your invoice is ready for payment.</p>
-  <p><strong>Invoice #:</strong> ${invoiceNumber}<br/>
-  <strong>Amount Due:</strong> ${formatCurrency(reservation.grandTotal)}</p>
+  ${invoiceNumber ? `<p><strong>Invoice #:</strong> ${invoiceNumber}<br/></p>` : ""}
+  <p><strong>Amount Due:</strong> ${formatCurrency(reservation.grandTotal)}</p>
+  ${invoiceUrl ? `
   <div style="text-align:center;margin:32px 0">
     <a href="${invoiceUrl}" style="background:#166534;color:white;padding:14px 28px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:16px">
       Pay Invoice →
     </a>
-  </div>
+  </div>` : ""}
   <p style="color:#166534;font-weight:bold">STL Yard Games — St. Peters, MO</p>
+  <p style="color:#6b7280;font-size:12px">Note: Our invoices are processed through Faces by Rachael — this is the same company as STL Yard Games. You can safely pay this invoice.</p>
 </div>`,
   });
 }

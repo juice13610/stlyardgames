@@ -207,9 +207,10 @@ export async function createInvoice(params: {
   // Log what we're sending for debugging
   console.log("QBO invoice payload:", JSON.stringify(invoice));
 
-  // QBO POST /invoice expects the object directly (not wrapped)
+  // QBO POST /invoice returns { Invoice: {...}, time: "..." }
   const result = await qbo<any>("POST", "/invoice", invoice);
-  return result.Invoice;
+  console.log("QBO createInvoice raw result keys:", Object.keys(result || {}));
+  return result.Invoice || result;
 }
 
 async function findOrCreateServiceItem(): Promise<string> {
