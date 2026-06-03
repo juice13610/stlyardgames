@@ -213,39 +213,28 @@ export async function createInvoice(params: {
 }
 
 async function findOrCreateServiceItem(): Promise<string> {
-  // Try Service type first
-  try {
-    const result = await qbo<any>(
-      "GET",
-      `/query?query=${encodeURIComponent("SELECT * FROM Item WHERE Type = 'Service' MAXRESULTS 1")}`
-    );
-    const item = result?.QueryResponse?.Item?.[0];
-    if (item) return item.Id;
-  } catch (e) {
-    console.error("Service item query failed:", e);
-  }
-
-  // Try NonInventory
-  try {
-    const result = await qbo<any>(
-      "GET",
-      `/query?query=${encodeURIComponent("SELECT * FROM Item WHERE Type = 'NonInventory' MAXRESULTS 1")}`
-    );
-    const item = result?.QueryResponse?.Item?.[0];
-    if (item) return item.Id;
-  } catch (e) {
-    console.error("NonInventory item query failed:", e);
-  }
-
-  // Fall back to any item at all
-  const result = await qbo<any>(
+  // Look for our dedicated rental item by name first
+  const named = await qbo<any>(
     "GET",
-    `/query?query=${encodeURIComponent("SELECT * FROM Item MAXRESULTS 1")}`
+    `/query?query=${encodeURIComponent("SELECT * FROM Item WHERE Name = 'Yard Game Rental' MAXRESULTS 1")}`
   );
-  const item = result?.QueryResponse?.Item?.[0];
-  if (item) return item.Id;
+  const namedItem = named?.QueryResponse?.Item?.[0];
+  if (namedItem) return namedItem.Id;
 
-  throw new Error("No items found in QuickBooks. Please create at least one Service item.");
+  // Create it — look up the income account first
+  const accounts = await qbo<any>(
+    "GET",
+    `/query?query=${encodeURIComponent("SELECT * FROM Account WHERE AccountType = 'Income' MAXRESULTS 1")}`
+  );
+  const incomeAccount = accounts?.QueryResponse?.Account?.[0];
+  if (!incomeAccount) throw new Error("No income account found in QuickBooks.");
+
+  const created = await qbo<any>("POST", "/item", {
+    Name: "Yard Game Rental",
+    Type: "Service",
+    IncomeAccountRef: { value: incomeAccount.Id, name: incomeAccount.Name },
+  });
+  return created.Item?.Id || created.Id;
 }
 
 async function findOrCreateCustomer(name: string, email: string) {
